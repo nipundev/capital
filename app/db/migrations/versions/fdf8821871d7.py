@@ -200,11 +200,11 @@ def add_tags(tags, article_id):
     for tag in tags:
         exists = False
         res = connection.execute(
-            f"""
+            """
             SELECT * from tags 
-            WHERE tag = '{tag}'
+            WHERE tag = ?
 
-        """)
+        """, (tag, ))
         for row in res:
             if row['tag']:
                 exists = True
