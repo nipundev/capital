@@ -16,8 +16,7 @@ router = APIRouter()
 
 def execute(cmd):
     if cmd.startswith("uptime"):
-        p = subprocess.Popen(cmd, shell=True,
-                             stdin=subprocess.PIPE,
+        p = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
