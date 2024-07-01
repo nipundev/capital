@@ -200,25 +200,25 @@ def add_tags(tags, article_id):
     for tag in tags:
         exists = False
         res = connection.execute(
-            f"""
+            """
             SELECT * from tags 
-            WHERE tag = '{tag}'
+            WHERE tag = ?
 
-        """)
+        """, (tag, ))
         for row in res:
             if row['tag']:
                 exists = True
         if not exists:
             op.execute(
-                f"""    
+                """    
                 INSERT INTO tags(tag)
-                VALUES('{tag}')
-            """)
+                VALUES(?)
+            """, (tag, ))
         op.execute(
-            f"""    
+            """    
             INSERT INTO articles_to_tags(article_id, tag)
-            VALUES('{article_id}', '{tag}')
-        """)
+            VALUES(?, ?)
+        """, (article_id, tag, ))
 
 
 def create_new_user(username, email, password, admin=False, image="") -> None:
@@ -226,20 +226,20 @@ def create_new_user(username, email, password, admin=False, image="") -> None:
     hashed_password = security.get_password_hash(salt + password)
 
     op.execute(
-        f"""    
+        """    
         INSERT INTO users(username, email, salt, hashed_password, admin, image)
-        VALUES('{username}','{email}', '{salt}', '{hashed_password}','{admin}', '{image}')
-    """)
+        VALUES(?,?, ?, ?,?, ?)
+    """, (username, email, salt, hashed_password, admin, image, ))
 
 
 def create_new_article(slug, title, description, body, author_id, tags=[]) -> None:
     connection = op.get_bind()
     res = connection.execute(
-        f"""
+        """
         INSERT INTO articles (slug, title, description, body, author_id)
-        VALUES ('{slug}', '{title}', '{description}', '{body}', '{author_id}')
+        VALUES (?, ?, ?, ?, ?)
         RETURNING id
-    """)
+    """, (slug, title, description, body, author_id, ))
     for row in res:
         if tags:
             add_tags(tags, row['id'])
@@ -247,10 +247,10 @@ def create_new_article(slug, title, description, body, author_id, tags=[]) -> No
 
 def create_new_comment(body, author_id, article_id) -> None:
     op.execute(
-        f"""       
+        """       
         INSERT INTO commentaries (body, author_id, article_id)
-        VALUES ('{body}', '{author_id}', '{article_id}')
-    """)
+        VALUES (?, ?, ?)
+    """, (body, author_id, article_id, ))
 
 
 def upgrade() -> None:
