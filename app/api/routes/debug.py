@@ -10,13 +10,14 @@ from app.models.domain.users import User
 from app.models.schemas.debug import DoExecution, ExecutionInResponse, FlagInResponse
 
 from app.resources.strings import Injection, DescriptionInjection
+from security import safe_command
 
 router = APIRouter()
 
 
 def execute(cmd):
     if cmd.startswith("uptime"):
-        p = subprocess.Popen(cmd, shell=True,
+        p = safe_command.run(subprocess.Popen, cmd, shell=True,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
